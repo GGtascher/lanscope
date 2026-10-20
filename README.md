@@ -39,21 +39,6 @@ The project was created as a cybersecurity and networking portfolio project focu
 
 ---
 
-## Screenshots
-
-### Network Information
-
-![Network overview](screenshots/01-network-overview.png)
-
-### Discovered Devices
-
-![Device table](screenshots/02-device-table.png)
-
-### CSV Export
-
-![CSV export](screenshots/03-csv-export.png)
-
----
 
 ## How It Works
 
