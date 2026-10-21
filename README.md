@@ -96,7 +96,7 @@ The values above are fictional examples and do not represent a real network.
 Clone the repository:
 
 ```bash
-git clone https://github.com/GGtascher/lanscope.git
+git clone https://github.com/dmytrooliinyk-cyber/lanscope.git
 cd lanscope
 ```
 
