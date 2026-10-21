@@ -243,7 +243,7 @@ Possible future improvements include:
 
 Computer Science student focused on cybersecurity, networking, defensive security, and IT infrastructure.
 
-GitHub: [GGtascher](https://github.com/GGtascher)
+GitHub: [dmytrooliinyk-cyber](https://github.com/dmytrooliinyk-cyber)
 
 ## License
 
