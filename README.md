@@ -2,11 +2,9 @@
 
 **LanScope is a lightweight Windows-focused local network device analyzer written in Python.**
 
-It provides visibility into the current network, discovers devices on the local subnet, collects IP/MAC information, attempts hostname and vendor identification, tracks previously observed devices, and exports scan results to structured files.
+It provides visibility into the active local network, discovers devices on the current subnet, collects IP and MAC information, attempts hostname and vendor identification, compares discovered devices with the previous scan, and exports results to structured files.
 
-The project was created as a cybersecurity and networking portfolio project focused on local asset discovery and network visibility.
-
----
+The project was created as a cybersecurity and networking portfolio project focused on local asset discovery, Windows networking, and network visibility.
 
 ## Features
 
@@ -14,7 +12,7 @@ The project was created as a cybersecurity and networking portfolio project focu
 - Local IPv4 address and subnet information
 - Default gateway detection
 - DNS server information
-- Network profile information
+- Windows network profile information
 - Wi-Fi information when available:
   - SSID
   - BSSID
@@ -23,35 +21,31 @@ The project was created as a cybersecurity and networking portfolio project focu
   - radio type
   - authentication method
   - cipher
-- Local subnet device discovery
-- IP address discovery
-- MAC address discovery
+- Local subnet discovery
+- IP and MAC address collection
 - Hostname resolution
 - MAC vendor lookup when available
 - Basic device-type estimation
-- Neighbor/ARP state information
-- Ping latency measurement
-- Detection of newly observed devices
-- Tracking of previously discovered devices
+- Windows Neighbor / ARP state information
+- Ping reachability and approximate probe timing
+- Detection of devices not present in the previous scan
+- Comparison with previous scan state
 - CSV export
-- JSON device history
+- JSON scan state
 - No packet-sniffing driver required
-
----
-
 
 ## How It Works
 
-LanScope follows a simple discovery workflow:
+LanScope follows a local discovery workflow:
 
 ```text
 Active Windows Network Interface
             ↓
-Determine Local IP / Gateway / DNS
+Local IP / Gateway / DNS
             ↓
-Select Local Scan Range
+Local Scan Range
             ↓
-Probe Local Addresses
+Address Probing
             ↓
 Windows Neighbor / ARP Table
             ↓
@@ -61,23 +55,23 @@ Hostname / Vendor Enrichment
             ↓
 Device Classification
             ↓
-Terminal Table
+Previous Scan Comparison
+            ↓
+Terminal Output
             ↓
 CSV / JSON Export
 ```
 
-The project intentionally avoids low-level packet sniffing and does not require Npcap or Scapy.
-
----
+LanScope intentionally avoids low-level packet sniffing and does not require Npcap or Scapy.
 
 ## Example Output
 
 ```text
-LanScope
-Local Network Device Analyzer
+LanScope 2.0
+Windows Local Network Analyzer
 
 Interface: Wi-Fi
-Local IP: 192.168.1.42
+Local IPv4: 192.168.1.42
 Gateway: 192.168.1.1
 Scan Network: 192.168.1.0/24
 
@@ -89,16 +83,14 @@ NEW      192.168.1.20   AA:BB:CC:DD:EE:02 laptop        Computer
 NEW      192.168.1.31   AA:BB:CC:DD:EE:03 Unknown       Mobile / IoT
 ```
 
-The values above are examples and do not represent a real network.
-
----
+The values above are fictional examples and do not represent a real network.
 
 ## Installation
 
 ### Requirements
 
-- Windows 10 / Windows 11
-- Python 3.12+
+- Windows 10 or Windows 11
+- Python 3.12 or newer
 - pip
 
 Clone the repository:
@@ -120,31 +112,33 @@ Activate it:
 .\.venv\Scripts\Activate.ps1
 ```
 
-Install dependencies:
+Install the dependencies:
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
 
----
-
 ## Usage
 
-Run:
+Run LanScope from the project directory:
 
 ```powershell
 python lanscope.py
 ```
 
-LanScope will:
+During a scan, LanScope:
 
-1. identify the active network interface;
-2. determine the local network;
-3. scan the local subnet;
-4. read Windows neighbor information;
-5. enrich discovered devices;
-6. display the result in a terminal table;
-7. save scan information locally.
+1. identifies the active Windows network interface;
+2. determines the local IPv4 network;
+3. reads gateway and DNS information;
+4. probes addresses on the local subnet;
+5. reads Windows Neighbor / ARP information;
+6. collects IP and MAC addresses;
+7. attempts hostname and vendor enrichment;
+8. estimates basic device types;
+9. compares discovered devices with the previous scan state;
+10. displays the results in the terminal;
+11. saves local scan information.
 
 Runtime files may include:
 
@@ -153,96 +147,103 @@ known_devices.json
 network_scan.csv
 ```
 
-These files are excluded from Git because they may contain local network information.
+These files are excluded from Git because they may contain information about the user's local network.
 
----
+### Output Files
+
+`known_devices.json` stores the device state written by the most recent scan and is used for comparison during the next run.
+
+`network_scan.csv` contains the structured results of the current scan.
+
+These files are runtime data and should not be committed to the repository.
 
 ## Security and Privacy
 
-LanScope performs local network discovery.
+LanScope performs local network discovery only.
 
 It does not:
 
 - upload scan results to external services;
-- capture network payloads;
+- capture packet payloads;
+- intercept network traffic;
 - execute code on discovered devices;
 - exploit vulnerabilities;
-- attempt authentication against discovered systems.
+- attempt authentication against discovered systems;
+- modify discovered devices.
 
 Scan results remain on the local machine.
 
 Only use network discovery on networks you own or are authorized to analyze.
 
----
-
 ## Limitations
 
-LanScope is a portfolio and learning project, not an enterprise network discovery platform.
+LanScope is a portfolio and learning project, not an enterprise asset-discovery or network-monitoring platform.
 
-Important limitations include:
+Current limitations include:
 
 - primarily designed for Windows;
-- some devices may ignore ICMP requests;
-- enterprise, university, hotel, or dormitory networks may use client isolation;
-- devices behind another router cannot normally expose their MAC address through local ARP;
-- vendor detection may be unavailable or incomplete;
-- hostname resolution depends on the local network configuration;
-- device-type classification is heuristic and may be inaccurate.
+- discovery depends on information visible from the current local network;
+- some devices may ignore ICMP probes;
+- university, hotel, dormitory, guest, and enterprise networks may use client isolation;
+- devices behind another router normally do not expose their MAC addresses through local ARP;
+- MAC vendor identification may be unavailable or incomplete;
+- hostname resolution depends on local DNS and network configuration;
+- device-type classification is heuristic and can be inaccurate;
+- ping timing is an approximate probe measurement rather than a dedicated latency-monitoring system;
+- JSON state is used for comparison with the previous scan rather than as a complete long-term asset history;
+- IPv6 discovery is not currently implemented.
 
 LanScope is not a vulnerability scanner.
-
----
 
 ## Technology Stack
 
 - Python
 - psutil
 - Rich
-- Windows PowerShell / networking commands
-- ARP / Neighbor discovery
+- mac-vendor-lookup
+- Windows PowerShell and networking commands
+- Windows Neighbor / ARP discovery
 - TCP/IP networking
-- CSV / JSON
+- CSV and JSON
 
----
+## Skills Demonstrated
 
-## Project Goals
+The project demonstrates practical work with:
 
-This project was built to practice:
-
-- network discovery;
-- TCP/IP fundamentals;
-- Windows networking;
-- asset visibility;
-- Python automation;
-- defensive security tooling;
-- structured security reporting.
-
----
+- TCP/IP fundamentals
+- IPv4 networks and subnets
+- ARP and neighbor discovery
+- default gateways and DNS
+- Windows network interfaces
+- Wi-Fi information
+- local asset discovery
+- IP and MAC addressing
+- hostname and vendor enrichment
+- Python automation
+- structured data export
+- defensive network visibility
 
 ## Future Improvements
 
-Possible future improvements:
+Possible future improvements include:
 
-- continuous monitoring mode;
-- device connect/disconnect alerts;
-- improved local MAC vendor database;
-- historical scan comparison;
-- network visualization;
-- configurable scan ranges;
-- IPv6 discovery;
-- optional GUI.
-
----
+- persistent long-term device history
+- historical scan comparison
+- continuous monitoring mode
+- device connect and disconnect alerts
+- improved MAC vendor data
+- configurable scan ranges
+- network visualization
+- IPv6 discovery
+- optional graphical interface
 
 ## Author
 
 **Dmytro Oliinyk**
 
-Computer Science student focused on cybersecurity, SOC operations, network security, and defensive security development.
+Computer Science student focused on cybersecurity, networking, defensive security, and IT infrastructure.
 
 GitHub: [GGtascher](https://github.com/GGtascher)
-
----
 
 ## License
 
