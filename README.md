@@ -105,6 +105,9 @@ Create a virtual environment:
 ```powershell
 python -m venv .venv
 ```
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
 
 Activate it:
 
